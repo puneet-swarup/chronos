@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+ <string name="app_name">Chronos</string>
+ <string name="nav_home">Home</string>
+ <string name="nav_schedule">Schedule</string>
+ <string name="nav_automations">Automations</string>
+ <string name="nav_ai">AI Assistant</string>
+ <string name="nav_activity">Activity</string>
+ <string name="nav_settings">Settings</string>
+</resources>

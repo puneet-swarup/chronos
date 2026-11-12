@@ -1,0 +1,26 @@
+# Gradle
+.gradle/
+build/
+/build/
+
+# Kotlin compiler session dir
+.kotlin/
+
+# Android
+local.properties
+.apk
+.aab
+.keystore
+
+# IntelliJ / Android Studio
+.idea/
+.iml
+
+# Build helper logs
+.log
+
+# Forge agent session files
+SESSION_CONTEXT.md
+FORGE_TODO.md
+FORGE_PLAN.md
+.forge-permissions.json
