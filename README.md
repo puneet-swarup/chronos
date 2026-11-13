@@ -2,6 +2,9 @@
 
 Your phone. Your rules. Your automation.
 
+https://img.shields.io/badge/GitHub-puneet--swarup%2Fchronos-blue
+https://img.shields.io/badge/License-MIT-yellow.svg
+
 Chronos is a local-first Android automation and scheduling platform. It goes far beyond
 alarms: schedule anything that Android permits - alarms, reminders, app launches,
 webhooks, workflows and conditional automations - and (optionally) describe what you

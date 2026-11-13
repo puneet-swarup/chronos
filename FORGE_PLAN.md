@@ -1,5 +1,8 @@
 # Chronos — Implementation Plan (forge_plan.md)
 
+> Repository (live): https://github.com/puneet-swarup/chronos — main pushed and in sync.
+> Donations: GitHub Sponsors (puneet-swarup) + Ko-fi (ko-fi.com/puneetswarup).
+
 > Derived from FORGE_TODO.md (Chronos PRD v1.1). This plan turns the product
 > specification into an ordered engineering backlog with milestones.
 > Locked decisions (from the PRD): Android, Kotlin, Jetpack Compose, Room,
