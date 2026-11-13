@@ -1,13 +1,13 @@
 # Support Chronos
 
-Chronos is developed as a local-first, privacy-respecting automation app. If it
-saves you time, consider supporting its development.
+Chronos is a local-first, privacy-respecting Android automation app. If it saves
+you time, consider supporting its development.
 
 ## Ways to help
 
 - Report bugs and request features via GitHub Issues.
 - Improve documentation or translate strings.
-- Sponsor ongoing development (see options below).
+- Sponsor ongoing development (see below).
 - Star the repo - it helps others discover Chronos.
 
 ## Donation channels
@@ -15,12 +15,7 @@ saves you time, consider supporting its development.
 | Channel | Where |
 |---------|-------|
 | GitHub Sponsors | https://github.com/sponsors/puneet-swarup |
-| Ko-fi | https://ko-fi.com/YOUR_KOFI_ID (replace) |
-| Buy Me a Coffee | https://buymeacoffee.com/YOUR_BMAC_ID (replace) |
-| UPI (India) | your-upi-id@bank (replace) |
-
-> GitHub handle puneet-swarup is set from the existing projects. Ko-fi, Buy Me a
-> Coffee and UPI are placeholders - send the real handles and they will be wired in.
+| Ko-fi | https://ko-fi.com/puneetswarup |
 
 ## What donations fund
 

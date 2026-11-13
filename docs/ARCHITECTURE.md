@@ -76,3 +76,18 @@ FunctionGemma provider can be added later without touching the scheduler.
 1. Schedules are stored durably and re-armed after boot/upgrade (ScheduleReconciler).
 2. Exact-alarm access is checked at runtime and reconciled.
 3. Failures are recorded and surfaced, never silently swallowed.
+
+## UI & theming (backend-agnostic)
+
+The Compose UI is deliberately decoupled from data sources and from concrete
+colors:
+
+- Design tokens live in ui/theme/Color.kt (ChronosColors) and ui/theme/Type.kt
+ (ChronosType). ui/theme/Theme.kt exposes a single ChronosTheme wrapper with
+ dark/light schemes. Screens read only MaterialTheme tokens, so the whole app
+ can be re-themed or redesigned without touching business logic.
+- Screens consume immutable UI state (e.g. HomeUiState) produced by ViewModels
+ (e.g. HomeViewModel) that are backed by the repository. Switching the data
+ source (Room today, remote later) or reworking the UI does not affect each other.
+- Dependencies are provided by a small ServiceLocator (manual DI) because Hilt's
+ Gradle plugin does not yet support AGP 9.2.0.

@@ -9,6 +9,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -16,18 +17,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.chronos.app.ui.ActivityScreen
+import com.chronos.app.ui.AiAssistantScreen
+import com.chronos.app.ui.AutomationsScreen
 import com.chronos.app.ui.HomeScreen
 import com.chronos.app.ui.ScheduleScreen
-import com.chronos.app.ui.AutomationsScreen
-import com.chronos.app.ui.AiAssistantScreen
-import com.chronos.app.ui.ActivityScreen
 import com.chronos.app.ui.SettingsScreen
+import com.chronos.app.ui.theme.ChronosTheme
 
-// Single-activity Compose host with the six persistent PRD sections.
 class MainActivity : ComponentActivity() {
  override fun onCreate(savedInstanceState: Bundle?) {
  super.onCreate(savedInstanceState)
- setContent { ChronosApp() }
+ setContent { ChronosTheme { ChronosApp() } }
  }
 }
 
@@ -45,6 +46,9 @@ private val navItems = listOf(
 @Composable
 fun ChronosApp() {
  val navController = rememberNavController()
+ val homeViewModel = ServiceLocator.newHomeViewModel()
+ val homeState by homeViewModel.state.collectAsState()
+
  Scaffold(
  bottomBar = {
  val backStack by navController.currentBackStackEntryAsState()
@@ -72,7 +76,7 @@ fun ChronosApp() {
  startDestination = "home",
  modifier = Modifier.padding(innerPadding),
  ) {
- composable("home") { HomeScreen() }
+ composable("home") { HomeScreen(homeState) }
  composable("schedule") { ScheduleScreen() }
  composable("automations") { AutomationsScreen() }
  composable("ai") { AiAssistantScreen() }

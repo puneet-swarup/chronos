@@ -16,11 +16,17 @@ local.properties
 .idea/
 .iml
 
-# Build helper logs
+# Build helper / log files
 .log
+.out
+mkrepo.
+dopush.bat
+bbuild.bat
+runtests.bat
+verify.bat
+verify*.log
+status.txt
 
 # Forge agent session files
 SESSION_CONTEXT.md
-FORGE_TODO.md
-FORGE_PLAN.md
 .forge-permissions.json

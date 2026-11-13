@@ -1,8 +1,4 @@
-# GitHub funding configuration.
-# github: your GitHub Sponsors username (confirmed from Battery-Guardian org).
-# Replace the ko_fi / buy_me_a_coffee / custom placeholders with real handles.
-
-github: puneet-swarup
-ko_fi: YOUR_KOFI_ID
-buy_me_a_coffee: YOUR_BMAC_ID
-custom: ["https://github.com/puneet-swarup"]
+# Funding destinations shown on the repo's Sponsor button.
+# Only pages the maintainer actually owns.
+github: [puneet-swarup]
+ko_fi: puneetswarup

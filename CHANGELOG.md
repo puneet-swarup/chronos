@@ -6,6 +6,14 @@ versioning follows Semantic Versioning.
 
 ## [Unreleased]
 
+### Changed
+- Theme-agnostic Compose UI: centralised design tokens (ChronosColors, ChronosType)
+ and a ChronosTheme wrapper; screens read MaterialTheme only, so the UI can be
+ re-themed/redesigned without touching logic.
+- State-driven Home screen via HomeUiState + HomeViewModel (repository-backed),
+ decoupling UI from the data source.
+- Donation channels finalised: GitHub Sponsors and Ko-fi (ko-fi.com/puneetswarup).
+
 ### Added
 - Core recurrence engine (daily/weekly/monthly/custom-interval, last-day,
  first-working-day, exclusions, start/end bounds).
