@@ -1,0 +1,51 @@
+site_name: Chronos
+site_description: Local-first Android automation and scheduling platform
+site_url: https://puneet-swarup.github.io/chronos/
+repo_url: https://github.com/puneet-swarup/chronos
+repo_name: puneet-swarup/chronos
+edit_uri: edit/main/docs/
+copyright: Licensed under PolyForm Noncommercial 1.0.0
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+    - search.suggest
+
+nav:
+  - Home: index.md
+  - Architecture: ARCHITECTURE.md
+  - Roadmap: ROADMAP.md
+  - Permissions: PERMISSIONS.md
+  - Testing: TESTING.md
+  - Contributing: CONTRIBUTING.md
+  - Support: SUPPORT.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+
+strict: true
