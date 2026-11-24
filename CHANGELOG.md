@@ -8,6 +8,14 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Scheduling pipeline: `ReconciliationPlanner` (pure), `AlarmScheduler`,
+  `ScheduleReconciler`, `AlarmReceiver`, `ScheduleExecutor` and `TimeChangeReceiver`.
+  Schedules now arm on a real `AlarmManager`, fire, record an execution row and
+  re-arm the next occurrence. Exact alarms are used when the user has granted
+  access; otherwise the alarm is armed inexactly and the degradation is recorded.
+- `RecurrenceCodec` and `ScheduleMapper`, closing a gap where `recurrenceJson` was a
+  column nothing wrote or read, so a stored schedule could not be armed at all.
+- Launcher icon (adaptive, vector) and notification icon.
 - First-run guide: a six-step walkthrough that explains what Chronos does and asks
   for the four things Android requires from the user - notifications, exact-alarm
   access, battery-optimisation exemption and Do Not Disturb access - stating the

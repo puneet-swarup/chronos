@@ -1,15 +1,81 @@
 package com.chronos.app.scheduling
 
-import android.content.Context
-import android.util.Log
+import com.chronos.app.data.ScheduleMapper
+import com.chronos.app.data.ScheduleRepository
+import com.chronos.core.scheduling.ReconciliationPlanner
+import com.chronos.core.scheduling.Schedule
+import java.time.Clock
+import java.time.LocalDateTime
 
-// Re-arms schedules after boot / upgrade / permission changes. This is the
-// seam where persistent schedules (Room) are read and AlarmManager alarms are
-// recreated. Until the Room store is wired it is a safe no-op that logs.
-object ScheduleReconciler {
- private const val TAG = "ChronosReconciler"
+// What one reconciliation pass did. Surfaced to the audit log now, and to the
+// Activity screen when that screen is wired up.
+data class ReconciliationResult(
+    val armed: Int = 0,
+    val cancelled: Int = 0,
+    val skipped: List<String> = emptyList(),
+    val degraded: List<String> = emptyList(),
+    val unreadable: List<String> = emptyList(),
+) {
+    fun summary(): String =
+        "reconciled: armed=" + armed + " cancelled=" + cancelled +
+            " skipped=" + skipped.size + " degraded=" + degraded.size +
+            " unreadable=" + unreadable.size
+}
 
- fun reconcile(context: Context) {
- Log.i(TAG, "Reconciling schedules for package " + context.packageName)
- }
+// Re-arms every enabled schedule from the database. Safe to call as often as
+// needed: it is idempotent, because each pass cancels and re-arms the same set.
+//
+// Runs after boot, after a package replace, on timezone or clock change, on app
+// start, and after a schedule fires.
+class ScheduleReconciler(
+    private val repository: ScheduleRepository,
+    private val scheduler: AlarmScheduler,
+    private val planner: ReconciliationPlanner = ReconciliationPlanner(),
+    private val clock: Clock = Clock.systemDefaultZone(),
+) {
+
+    suspend fun reconcile(): ReconciliationResult {
+        val entities = repository.allSchedules()
+        val domain = ArrayList<Schedule>(entities.size)
+        val unreadable = ArrayList<String>()
+
+        for (entity in entities) {
+            try {
+                domain.add(ScheduleMapper.toDomain(entity))
+            } catch (e: IllegalArgumentException) {
+                // A row that cannot be read must not stop the other schedules
+                // from being armed. It is reported instead of silently dropped.
+                unreadable.add(entity.id + ": " + (e.message ?: "unreadable"))
+            }
+        }
+
+        val now = LocalDateTime.now(clock)
+        val plan = planner.plan(
+            schedules = domain,
+            now = now,
+            canScheduleExact = scheduler.canScheduleExactAlarms(),
+            zone = clock.zone,
+        )
+
+        for (id in plan.cancel) {
+            scheduler.cancel(id)
+        }
+        for (request in plan.arm) {
+            scheduler.arm(request)
+            repository.updateNextRun(request.scheduleId, request.nextRun.toString())
+        }
+        for (skipped in plan.skip) {
+            repository.updateNextRun(skipped.scheduleId, null)
+        }
+
+        val result = ReconciliationResult(
+            armed = plan.arm.size,
+            cancelled = plan.cancel.size,
+            skipped = plan.skip.map { it.scheduleId + ": " + it.reason },
+            degraded = plan.degraded.map { it.scheduleId + ": " + (it.note ?: "degraded") },
+            unreadable = unreadable,
+        )
+        repository.recordAudit("scheduler", result.summary())
+        return result
+    }
 }

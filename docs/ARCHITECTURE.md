@@ -58,6 +58,37 @@ Built-in actions (DefaultActions.registry()):
 - ExecutionRouter decides whether a schedule should use an exact alarm or
  flexible work based on its kind and precision needs.
 
+## Scheduling pipeline (M5)
+
+The scheduler is split so that every decision is testable without a device, and
+the Android layer only performs requests it is handed:
+
+```
+Room (schedules)  ->  ScheduleMapper  ->  ReconciliationPlanner  ->  ReconciliationPlan
+                                                                          |
+                                     AlarmScheduler.cancel/arm  <---------+
+                                                                          |
+                                                     AlarmManager -> AlarmReceiver
+                                                                          |
+                                     ScheduleExecutor: execution row + notification
+                                                                          |
+                                                     ScheduleReconciler (re-arm next)
+```
+
+- `ReconciliationPlanner` (in `chronos-core`, pure) decides, for every stored
+  schedule, whether to cancel it, arm it, or skip it — and with which precision.
+  It is the only place that reasons about "is this schedule still due?".
+- `AlarmScheduler` is the only class that touches `AlarmManager`. It makes no
+  decisions: it arms exactly when told to and exactness is available, otherwise it
+  uses `setAndAllowWhileIdle` and the planner has already recorded the degradation.
+- `ScheduleReconciler` re-plans the whole set and runs on boot, after a package
+  replace, on clock or timezone change, on app start, and after every firing. It is
+  idempotent: each pass cancels and re-arms the same set.
+- `ScheduleExecutor` writes one `executions` row per attempt — including failures,
+  with an error code — then re-arms. Nothing fails silently.
+- `RecurrenceCodec` stores recurrences as ISO-8601 text in `recurrenceJson`, with a
+  separate DTO so the domain model carries no serialization annotations.
+
 ## Workflow model and validation
 
 - Versioned Workflow with a sealed WorkflowNode hierarchy (Action, Condition,

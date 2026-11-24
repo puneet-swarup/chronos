@@ -31,14 +31,16 @@ data class WorkflowEntity(
 @Entity(tableName = "executions")
 data class ExecutionEntity(
  @PrimaryKey(autoGenerate = true) val id: Long = 0,
- val scheduleId: String?,
- val workflowId: String?,
+ val scheduleId: String? = null,
+ val workflowId: String? = null,
  val state: String,
  val scheduledAt: Long,
- val startedAt: Long?,
- val finishedAt: Long?,
- val errorCode: String?,
- val errorMessage: String?,
+ val startedAt: Long? = null,
+ val finishedAt: Long? = null,
+ // Diagnostics are optional by nature; requiring them at every call site only
+ // produced noise. A null errorCode means "nothing went wrong".
+ val errorCode: String? = null,
+ val errorMessage: String? = null,
  val retryCount: Int = 0,
 )
 

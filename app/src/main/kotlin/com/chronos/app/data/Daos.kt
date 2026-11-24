@@ -9,57 +9,65 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ScheduleDao {
- @Query("SELECT * FROM schedules ORDER BY name")
- fun observeAll(): Flow<List<ScheduleEntity>>
+    @Query("SELECT * FROM schedules ORDER BY name")
+    fun observeAll(): Flow<List<ScheduleEntity>>
 
- @Query("SELECT * FROM schedules WHERE enabled = 1")
- suspend fun enabled(): List<ScheduleEntity>
+    @Query("SELECT * FROM schedules ORDER BY name")
+    suspend fun all(): List<ScheduleEntity>
 
- @Query("SELECT * FROM schedules WHERE id = :id")
- suspend fun byId(id: String): ScheduleEntity?
+    @Query("SELECT * FROM schedules WHERE enabled = 1")
+    suspend fun enabled(): List<ScheduleEntity>
 
- @Insert(onConflict = OnConflictStrategy.REPLACE)
- suspend fun upsert(schedule: ScheduleEntity)
+    @Query("SELECT * FROM schedules WHERE id = :id")
+    suspend fun byId(id: String): ScheduleEntity?
 
- @Update
- suspend fun update(schedule: ScheduleEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(schedule: ScheduleEntity)
 
- @Query("DELETE FROM schedules WHERE id = :id")
- suspend fun delete(id: String)
+    @Update
+    suspend fun update(schedule: ScheduleEntity)
+
+    // The reconciler owns nextRun; a dedicated update keeps it from rewriting the
+    // whole row (and re-auditing it) on every pass.
+    @Query("UPDATE schedules SET nextRun = :nextRun WHERE id = :id")
+    suspend fun updateNextRun(id: String, nextRun: String?)
+
+    @Query("DELETE FROM schedules WHERE id = :id")
+    suspend fun delete(id: String)
 }
 
 @Dao
 interface WorkflowDao {
- @Query("SELECT * FROM workflows ORDER BY name")
- fun observeAll(): Flow<List<WorkflowEntity>>
+    @Query("SELECT * FROM workflows ORDER BY name")
+    fun observeAll(): Flow<List<WorkflowEntity>>
 
- @Query("SELECT * FROM workflows WHERE id = :id")
- suspend fun byId(id: String): WorkflowEntity?
+    @Query("SELECT * FROM workflows WHERE id = :id")
+    suspend fun byId(id: String): WorkflowEntity?
 
- @Insert(onConflict = OnConflictStrategy.REPLACE)
- suspend fun upsert(workflow: WorkflowEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(workflow: WorkflowEntity)
 
- @Query("DELETE FROM workflows WHERE id = :id")
- suspend fun delete(id: String)
+    @Query("DELETE FROM workflows WHERE id = :id")
+    suspend fun delete(id: String)
 }
 
 @Dao
 interface ExecutionDao {
- @Query("SELECT * FROM executions ORDER BY scheduledAt DESC LIMIT :limit")
- fun observeRecent(limit: Int = 100): Flow<List<ExecutionEntity>>
+    @Query("SELECT * FROM executions ORDER BY scheduledAt DESC LIMIT :limit")
+    fun observeRecent(limit: Int = 100): Flow<List<ExecutionEntity>>
 
- @Insert
- suspend fun insert(execution: ExecutionEntity): Long
+    @Insert
+    suspend fun insert(execution: ExecutionEntity): Long
 
- @Query("SELECT * FROM executions ORDER BY scheduledAt DESC LIMIT 1")
- suspend fun lastExecution(): ExecutionEntity?
+    @Query("SELECT * FROM executions ORDER BY scheduledAt DESC LIMIT 1")
+    suspend fun lastExecution(): ExecutionEntity?
 }
 
 @Dao
 interface AuditDao {
- @Query("SELECT * FROM audit ORDER BY timestamp DESC LIMIT :limit")
- fun observeRecent(limit: Int = 200): Flow<List<AuditEntity>>
+    @Query("SELECT * FROM audit ORDER BY timestamp DESC LIMIT :limit")
+    fun observeRecent(limit: Int = 200): Flow<List<AuditEntity>>
 
- @Insert
- suspend fun insert(entry: AuditEntity)
+    @Insert
+    suspend fun insert(entry: AuditEntity)
 }
