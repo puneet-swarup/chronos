@@ -49,12 +49,6 @@ fun ActivityScreen() = SectionScreen(
 )
 
 @Composable
-fun SettingsScreen() = SectionScreen(
- title = "Settings",
- subtitle = "Permissions, integrations, AI models and standard/advanced mode.",
-)
-
-@Composable
 private fun SectionScreen(title: String, subtitle: String, detail: String? = null) {
  Column(
  modifier = Modifier.fillMaxSize().padding(24.dp),

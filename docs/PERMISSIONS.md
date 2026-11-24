@@ -31,6 +31,7 @@ activated, never up front.
 | `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | Ask the user to exempt Chronos from Doze so schedules survive |
 | `ACCESS_NOTIFICATION_POLICY` | Do Not Disturb control |
 | `VIBRATE` | Alarm and notification vibration |
+| `REQUEST_INSTALL_PACKAGES` | Self-updates: hand a downloaded APK to the system installer. Android still asks the user to confirm each install, and the user can revoke "install unknown apps" at any time |
 
 No permission is used to read contacts, messages, files, location or the clipboard.
 

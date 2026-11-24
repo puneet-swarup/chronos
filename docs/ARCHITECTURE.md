@@ -89,6 +89,37 @@ Room (schedules)  ->  ScheduleMapper  ->  ReconciliationPlanner  ->  Reconciliat
 - `RecurrenceCodec` stores recurrences as ISO-8601 text in `recurrenceJson`, with a
   separate DTO so the domain model carries no serialization annotations.
 
+## Update pipeline
+
+The app ships itself. A push to `main` builds a signed APK, publishes it as a
+GitHub Release, and every installed copy offers it from Settings.
+
+```
+push to main -> Release workflow -> signed APK + .sha256 -> GitHub Release
+                                                                |
+app start (throttled) -> UpdateManager -> GitHubReleaseSource ---+
+                              |
+                              v
+                  AndroidUpdateInstaller: download -> verify SHA-256
+                              |
+                              v
+                  PackageInstaller session -> system confirmation -> InstallResultReceiver
+```
+
+- `UpdatePolicy` (pure) decides whether a release is newer, parses the version code
+  out of the tag, and throttles checks. Version **code**, not name, decides -
+  because that is what Android compares when installing over an existing app.
+- `UpdateManager` owns the state machine (`Idle`, `Checking`, `Available`,
+  `Downloading`, `Installing`, `Installed`, `Failed`) and is unit-tested with a fake
+  source and installer.
+- `AndroidUpdateInstaller` downloads to the cache, verifies the published SHA-256,
+  and commits a `PackageInstaller` session.
+- **It cannot install silently.** A normal app may only ask Android to install; the
+  user confirms in a system dialog. The updater removes the cable and the file
+  copy, not the confirmation.
+- Signing uses a committed test key so CI builds install over each other. See
+  `keystore/README.md` for why, and for what that costs.
+
 ## Workflow model and validation
 
 - Versioned Workflow with a sealed WorkflowNode hierarchy (Action, Condition,
