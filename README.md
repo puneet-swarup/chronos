@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="store/icon-128.png" width="96" height="96" alt="Chronos icon">
+</p>
+
 # Chronos
 
 **Your phone. Your rules. Your automation.**
