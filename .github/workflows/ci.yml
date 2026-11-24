@@ -42,7 +42,7 @@ jobs:
             "build-tools;36.0.0"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       # The exec bit is committed, but a clone on a filesystem that drops modes
       # (or a Windows checkout) loses it, so make it explicit.
