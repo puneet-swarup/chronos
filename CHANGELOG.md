@@ -8,6 +8,12 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- First-run guide: a six-step walkthrough that explains what Chronos does and asks
+  for the four things Android requires from the user - notifications, exact-alarm
+  access, battery-optimisation exemption and Do Not Disturb access - stating the
+  consequence of refusing each one. Nothing is blocking, every permission can be
+  re-checked from the guide, and the flow is driven by pure-Kotlin state so it is
+  unit-tested without a device.
 - Recurrence engine: daily, weekly, monthly and custom-interval rules, month-end and
   first-working-day handling, day-31 clamping, exclusion dates, inclusive start and
   end bounds.

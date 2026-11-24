@@ -50,8 +50,13 @@ sections, design tokens and a single `ChronosTheme` wrapper, `HomeUiState` +
 `ChronosDatabase`, `ScheduleRepository`). Hilt is replaced by a manual
 `ServiceLocator` because its Gradle plugin does not support AGP 9.2.0.
 
+Implemented: a first-run guide (`onboarding/`) that walks a new user through what the
+app does and through the four permissions Android requires from them, with the
+consequence of refusing each one stated up front.
+
 Pending: wire the Schedule, Automations, AI, Activity and Settings screens to real
-data; add an app icon and adaptive icon resources.
+data; add an app icon and adaptive icon resources; let Settings reopen the guide
+(`OnboardingViewModel.reopen()` exists but has no UI entry point yet).
 
 ## M5 — Android scheduling adapters (next up)
 
