@@ -1,18 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Notification icon: a clock face, white on transparent so the system tint
-     applies. Drawn as geometry rather than imported artwork. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-
     <path
-        android:fillColor="#FFFFFFFF"
-        android:fillType="evenOdd"
-        android:pathData="M12,3a9,9 0 1,0 0,18a9,9 0 1,0 0,-18z M12,4.5a7.5,7.5 0 1,1 0,15a7.5,7.5 0 1,1 0,-15z" />
-
+        android:pathData="M 14.74,4.48 A 8.0,8.0 0 1 1 9.26,4.48"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.2" />
     <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M11.25,6.5h1.5v6.25h3.25v1.5h-4.75z" />
+        android:pathData="M 11.80,3.56 L 8.33,6.97 L 6.95,3.18 Z"
+        android:fillColor="#FFFFFF" />
+    <path
+        android:pathData="M 12.0,12.0 L 12.0,7.40"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.0"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M 12.0,12.0 L 15.40,14.30"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.0"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M 10.90,12.0 a 1.1,1.1 0 1 0 2.20,0 a 1.1,1.1 0 1 0 -2.20,0 z"
+        android:fillColor="#FFFFFF" />
 </vector>
