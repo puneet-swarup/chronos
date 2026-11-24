@@ -2,39 +2,50 @@
 
 ## Philosophy
 
-Tests are written alongside code. The pure-Kotlin chronos-core module is the
-primary test target because it holds all the logic that must be correct: recurrence
-math, the workflow validator, the action registry and the natural-language parser.
+Tests are written alongside code. The pure-Kotlin `chronos-core` module is the
+primary test target because it holds the logic that must be correct: recurrence
+maths, the workflow validator, the action registry and the natural-language parser.
+The Android module is tested with Robolectric so receivers, ViewModels and the Room
+layer run on a plain JVM.
 
 ## Running tests
 
-bash
-./gradlew test # all JVM unit tests
-./gradlew :chronos-core:test # core domain tests only
+```bash
+./gradlew test                  # all JVM unit tests
+./gradlew :chronos-core:test    # core domain tests only
+./gradlew :app:testDebugUnitTest
+```
 
-
-On Windows use gradlew.bat.
+On Windows use `gradlew.bat`. CI runs the same commands on every push and pull
+request.
 
 ## What is covered today
 
 | Test class | Focus |
 |------------|-------|
-| RecurrenceEngineTest | daily/weekly/monthly recurrence, month-end, day-31 clamping, exclusions, interval vs clock-time, ranges, end-date |
-| CoreActionsTest | validation + execution of built-in actions, registry contents, capability reporting |
-| ScheduleAndRoutingTest | next-occurrence computation, disabled schedules, exact-alarm vs flexible-work routing |
-| RuleBasedParserTest | English/Hindi/Hinglish parsing, time extraction, URL detection, intent-to-workflow compilation + validation |
-| WorkflowValidatorTest | valid workflows, unknown actions, duplicate ids, empty workflows, capability warnings |
+| `RecurrenceEngineTest` | daily/weekly/monthly recurrence, month-end, day-31 clamping, exclusions, interval vs clock-time, ranges, end date |
+| `CoreActionsTest` | validation and execution of built-in actions, registry contents, capability reporting |
+| `ScheduleAndRoutingTest` | next-occurrence computation, disabled schedules, exact-alarm vs flexible-work routing |
+| `RuleBasedParserTest` | English/Hindi/Hinglish parsing, time extraction, URL detection, intent-to-workflow compilation and validation |
+| `WorkflowValidatorTest` | valid workflows, unknown actions, duplicate ids, empty workflows, capability warnings |
+| `HomeViewModelTest` | UI state emitted from a fake repository |
 
-## Test matrix (device)
+## What is not covered yet
 
-The PRD defines a manual device matrix for areas that require a real device
-(alarms, reboot recovery, OEM background restrictions):
+- Anything that touches a real `AlarmManager` or `WorkManager` — the adapters do not
+  exist yet (M5). This is the largest gap and the first thing to close.
+- The Compose screens beyond the Home screen.
+- DST and timezone transitions (M1 remainder).
 
-- Application closed -> eligible scheduled tasks continue
-- Device rebooted -> eligible schedules are restored
-- Timezone / clock changed -> schedules are recalculated
-- Exact-alarm access revoked -> affected schedules are reported
-- Duplicate trigger -> no duplicate execution
+## Device test matrix
 
-Test on at least: a flagship device, a mid-range device, and a device with
-aggressive background restrictions (e.g. Samsung, Xiaomi).
+The PRD defines a manual matrix for behaviour that only a real device can prove:
+
+- App closed → eligible scheduled tasks still fire
+- Device rebooted → eligible schedules are restored
+- Timezone or clock changed → schedules are recalculated, not duplicated
+- Exact-alarm access revoked → affected schedules are reported, not silently dropped
+- Duplicate trigger → exactly one execution
+
+Test on at least three classes of device: a flagship, a mid-range phone, and one with
+aggressive background restrictions (Samsung, Xiaomi, Oppo).

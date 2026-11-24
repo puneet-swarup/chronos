@@ -14,24 +14,28 @@ and reusable by the Android layer. The app module depends on chronos-core.
 
 ## Layering
 
-
-app/ Compose UI, Navigation, platform adapters, receivers
- |
-chronos-core/ domain: scheduling, workflow, actions, AI seam
+```
+app/            Compose UI, Navigation, Room, receivers, platform adapters
+                        |
+                        | depends on
+                        v
+chronos-core/   domain: scheduling, workflow, actions, AI seam
+```
 
 
 ## The unified action contract (key design decision)
 
 Every schedulable operation implements one interface:
 
-kotlin
+```kotlin
 interface ChronosAction {
- val type: String
- fun validate(params: ActionParameters, context: CapabilityContext): ValidationResult
- suspend fun execute(context: ExecutionContext, params: ActionParameters): ActionResult
- fun requiredCapabilities(): Set<Capability>
- fun executionPolicy(): ExecutionPolicy
+    val type: String
+    fun validate(params: ActionParameters, context: CapabilityContext): ValidationResult
+    suspend fun execute(context: ExecutionContext, params: ActionParameters): ActionResult
+    fun requiredCapabilities(): Set<Capability>
+    fun executionPolicy(): ExecutionPolicy
 }
+```
 
 
 Actions are registered in an ActionRegistry and looked up by type. The scheduler

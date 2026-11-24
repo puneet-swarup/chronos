@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://puneet-swarup.github.io/chronos/
+    about: Architecture, roadmap, permissions and testing notes
+  - name: Security vulnerability
+    url: https://github.com/puneet-swarup/chronos/security/advisories/new
+    about: Report privately — please do not open a public issue for security problems
+  - name: Support the project
+    url: https://github.com/sponsors/puneet-swarup
+    about: Sponsorship and donation channels
