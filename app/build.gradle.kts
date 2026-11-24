@@ -70,6 +70,9 @@ dependencies {
  implementation(composeBom)
  implementation("androidx.compose.ui:ui")
  implementation("androidx.compose.ui:ui-tooling-preview")
+ // Scroll modifiers and layout primitives; material3 brings this in
+ // transitively, but the first-run guide uses foundation directly.
+ implementation("androidx.compose.foundation:foundation")
  implementation("androidx.compose.material3:material3")
  implementation("androidx.navigation:navigation-compose:2.8.4")
 
