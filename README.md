@@ -3,7 +3,7 @@
 Your phone. Your rules. Your automation.
 
 https://img.shields.io/badge/GitHub-puneet--swarup%2Fchronos-blue
-https://img.shields.io/badge/License-MIT-yellow.svg
+https://img.shields.io/badge/License-PolyForm%20Noncommercial%201.0.0-orange.svg
 
 Chronos is a local-first Android automation and scheduling platform. It goes far beyond
 alarms: schedule anything that Android permits - alarms, reminders, app launches,
@@ -80,4 +80,4 @@ See FORGE_PLAN.md for the milestone-by-milestone backlog (M0-M8).
 
 ## License
 
-MIT - see LICENSE.
+Licensed under [PolyForm Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0/). Commercial use requires a licence — write to puneetswarup@gmail.com.
