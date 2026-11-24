@@ -1,0 +1,69 @@
+name: Bug report
+description: Something behaves incorrectly, or a schedule does not fire when it should
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing: Chronos is pre-alpha, and the alarm/WorkManager adapters (M5)
+        are not written yet — a schedule that never fires is expected today, not a
+        bug. Please check the [roadmap](https://puneet-swarup.github.io/chronos/ROADMAP/)
+        first.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Chronos
+        2. Create a daily schedule at 08:00
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: Chronos version or commit
+      description: Output of `git rev-parse --short HEAD`, or the versionName from the APK
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and Android version
+      placeholder: Pixel 7, Android 16 (API 36)
+    validations:
+      required: true
+  - type: dropdown
+    id: install-source
+    attributes:
+      label: How did you build or install it?
+      options:
+        - Built locally with ./gradlew :app:assembleDebug
+        - Android Studio run configuration
+        - Other (explain above)
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant logcat output, with anything personal removed
+      render: shell
+    validations:
+      required: false
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I have read the roadmap and this is not a known unimplemented milestone
+          required: true
+        - label: I have removed personal data from any logs attached
+          required: true

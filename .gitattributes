@@ -1,0 +1,28 @@
+# Normalise line endings in the repository, not in the working tree
+* text=auto
+
+# Kotlin, Gradle and docs
+*.kt          text
+*.kts         text
+*.md          text
+*.xml         text
+*.yml         text
+*.yaml        text
+*.json        text
+*.properties  text
+
+# Gradle wrapper: the shell script must keep LF so Linux CI can execute it
+gradlew       text eol=lf
+gradlew.bat   text eol=crlf
+*.sh          text eol=lf
+*.bat         text eol=crlf
+
+# Binary artefacts
+*.png         binary
+*.jpg         binary
+*.webp        binary
+*.jar         binary
+*.apk         binary
+*.aab         binary
+*.jks         binary
+*.keystore    binary

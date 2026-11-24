@@ -1,0 +1,32 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    ignore:
+      # The Kotlin compiler and the Compose compiler plugin are pinned at 2.0.21
+      # and must move together (see build.gradle.kts). Bumping stdlib or test
+      # artefacts ahead of the compiler breaks the build with
+      # "Module was compiled with an incompatible version of Kotlin".
+      - dependency-name: "org.jetbrains.kotlin:*"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+      # AGP 9.x is pinned: Hilt (deferred) and the KSP source-set flag in
+      # gradle.properties are both tied to it.
+      - dependency-name: "com.android.application"
+        update-types:
+          - "version-update:semver-major"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "ci"
+      - "dependencies"

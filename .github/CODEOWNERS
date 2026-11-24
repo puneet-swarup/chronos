@@ -1,0 +1,6 @@
+# Default owner for everything in the repository
+* @puneet-swarup
+
+# Domain logic and scheduling maths need the closest review
+/chronos-core/ @puneet-swarup
+/.github/ @puneet-swarup

@@ -1,32 +1,41 @@
 # Gradle
 .gradle/
 build/
-/build/
+!gradle/wrapper/gradle-wrapper.jar
 
-# Kotlin compiler session dir
+# Kotlin
 .kotlin/
 
 # Android
 local.properties
-.apk
-.aab
-.keystore
+captures/
+.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+*.jks
+*.keystore
+!debug.keystore
 
-# IntelliJ / Android Studio
+# MkDocs build output
+site/
+
+# IDE
 .idea/
-.iml
+*.iml
+*.ipr
+*.iws
+.vscode/
+.fleet/
 
-# Build helper / log files
-.log
-.out
-mkrepo.
-dopush.bat
-bbuild.bat
-runtests.bat
-verify.bat
-verify*.log
-status.txt
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
 
-# Forge agent session files
+# Local tooling scratch (not part of the project)
 SESSION_CONTEXT.md
 .forge-permissions.json
+status.txt
+*.log
