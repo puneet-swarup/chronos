@@ -13,7 +13,7 @@ intended it to be.
 | M2 | Workflow model, deterministic validator, intent compiler | Done, except execution state machine |
 | M3 | Action contract, registry, four built-in actions | Done |
 | M4 | Android app shell: Compose, navigation, Room, DI | Mostly done — Home screen is wired, five sections are static |
-| M5 | Android scheduling adapters: AlarmManager, WorkManager, reboot and clock-change recovery | Not started (stubs only) |
+| M5 | Android scheduling adapters: AlarmManager, WorkManager, reboot and clock-change recovery | In progress — alarms arm, fire and re-arm; WorkManager still missing |
 | M6 | Integrations: app discovery, device controls, event triggers, capability manager | Not started |
 | M7 | Local AI: LiteRT-LM provider, model manager, tiered model selection | Seam only — no model |
 | M8 | Advanced mode (Shizuku/Termux/Tasker), import/export, security audit, release | Not started |
@@ -58,21 +58,32 @@ Pending: wire the Schedule, Automations, AI, Activity and Settings screens to re
 data; add an app icon and adaptive icon resources; let Settings reopen the guide
 (`OnboardingViewModel.reopen()` exists but has no UI entry point yet).
 
-## M5 — Android scheduling adapters (next up)
+## M5 — Android scheduling adapters
 
-This is the milestone that makes Chronos an automation app rather than a model of
-one. Needed, in order:
+Done:
 
-1. `AlarmScheduler` — `AlarmManager.setExactAndAllowWhileIdle`, with a runtime check
-   for exact-alarm access and a fallback to inexact alarms when it is denied.
-2. `WorkScheduler` — `WorkManager` for flexible and interval work, with constraints
-   and retry policy.
-3. `ScheduleReconciler` — read schedules from Room, cancel stale alarms, re-arm
-   current ones. Called from boot, package-replace, timezone change and app start.
-4. `AlarmReceiver` / `WorkReceiver` — dispatch into the workflow executor, record an
-   `Execution` row, and de-duplicate so a trigger cannot run twice.
-5. Permission-change and exact-alarm-revoked receivers, surfaced as honest warnings
-   rather than silent failures.
+1. `ReconciliationPlanner` — pure decision layer: cancel, arm or skip every stored
+   schedule, with the exactness the device actually allows.
+2. `AlarmScheduler` — `setExactAndAllowWhileIdle` when exact access is granted,
+   `setAndAllowWhileIdle` otherwise, with `SecurityException` handled if access is
+   revoked between the check and the call.
+3. `ScheduleReconciler` — re-plans the whole set on boot, package replace, clock or
+   timezone change, app start, and after every firing. Idempotent by design.
+4. `AlarmReceiver` + `ScheduleExecutor` — one `executions` row per attempt including
+   failures with an error code, a notification, then a re-arm.
+5. `RecurrenceCodec` + `ScheduleMapper` — the persistence bridge that was missing;
+   `recurrenceJson` was previously a column nothing wrote or read.
+6. `TimeChangeReceiver` — clock and timezone changes re-plan every schedule.
+7. Launcher and notification icons, so the app no longer ships the default robot.
+
+Still missing:
+
+- `WorkScheduler` — `WorkManager` for flexible and interval work, with constraints
+  and retry. Long intervals currently fall back to an inexact alarm, and the planner
+  records that degradation rather than hiding it.
+- Duplicate-execution prevention beyond "one PendingIntent per schedule id".
+- Exact-alarm-revoked and permission-change receivers surfaced in the UI.
+- The Activity screen that shows `executions` rows and reconciliation results.
 
 Acceptance: a schedule survives reboot, a timezone change and a force-stop on a
 real device, and a failed arm is visible in the Activity screen.
