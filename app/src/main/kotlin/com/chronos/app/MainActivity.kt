@@ -9,6 +9,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -69,6 +70,11 @@ fun ChronosApp() {
     val navController = rememberNavController()
     val homeViewModel = remember { ServiceLocator.newHomeViewModel() }
     val homeState by homeViewModel.state.collectAsState()
+    val updateManager = remember { ServiceLocator.updateManager }
+    val updateState by updateManager.state.collectAsState()
+
+    // Throttled inside the manager, so this is cheap on every cold start.
+    LaunchedEffect(Unit) { updateManager.checkOnStart() }
 
     Scaffold(
         bottomBar = {
@@ -102,7 +108,14 @@ fun ChronosApp() {
             composable("automations") { AutomationsScreen() }
             composable("ai") { AiAssistantScreen() }
             composable("activity") { ActivityScreen() }
-            composable("settings") { SettingsScreen() }
+            composable("settings") {
+                SettingsScreen(
+                    updateState = updateState,
+                    currentVersion = BuildConfig.VERSION_NAME,
+                    onCheckForUpdates = updateManager::checkNow,
+                    onInstall = updateManager::install,
+                )
+            }
         }
     }
 }

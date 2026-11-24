@@ -16,7 +16,7 @@ intended it to be.
 | M5 | Android scheduling adapters: AlarmManager, WorkManager, reboot and clock-change recovery | In progress — alarms arm, fire and re-arm; WorkManager still missing |
 | M6 | Integrations: app discovery, device controls, event triggers, capability manager | Not started |
 | M7 | Local AI: LiteRT-LM provider, model manager, tiered model selection | Seam only — no model |
-| M8 | Advanced mode (Shizuku/Termux/Tasker), import/export, security audit, release | Not started |
+| M8 | Advanced mode (Shizuku/Termux/Tasker), import/export, security audit, release | Partial — signed test builds and self-updates work; advanced mode and the audit are not started |
 
 ## M1 — Universal scheduler
 
@@ -104,9 +104,23 @@ selection by device profile, and language detection for English / Hindi / Hingli
 
 ## M8 — Advanced mode and release
 
-Optional Shizuku / Termux / Tasker bridges, workflow import and export, a security
-audit with Android Keystore credential storage, the audit log, and a device
-compatibility matrix across flagship, mid-range and aggressive-OEM phones.
+Done:
+
+- **Self-updates.** Every push to `main` builds a signed APK, publishes it as a
+  GitHub Release, and the app offers it from Settings. It checks on start (throttled
+  to every six hours), verifies the published SHA-256, and hands the APK to the
+  system installer. Android still asks for one confirmation; a normal app cannot
+  install silently.
+- **Signing** with a committed test key, documented in `keystore/README.md`.
+
+Still open:
+
+- Replace the public test key before any real distribution.
+- Optional Shizuku / Termux / Tasker bridges.
+- Workflow import and export.
+- A security audit with Android Keystore credential storage, and the audit log UI.
+- A device compatibility matrix across flagship, mid-range and aggressive-OEM
+  phones.
 
 ## Working agreement
 

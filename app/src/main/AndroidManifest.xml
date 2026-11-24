@@ -23,6 +23,11 @@
     <!-- Do Not Disturb control. -->
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 
+    <!-- Self-updates: lets Chronos hand a downloaded APK to the system installer.
+         Android still shows its own confirmation dialog; a normal app cannot
+         install silently. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <application
         android:name=".ChronosApplication"
         android:allowBackup="true"
@@ -68,6 +73,12 @@
         <!-- Internal only: the PendingIntent is built in this process. -->
         <receiver
             android:name=".scheduling.AlarmReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!-- Receives the outcome of a PackageInstaller session. -->
+        <receiver
+            android:name=".update.InstallResultReceiver"
             android:enabled="true"
             android:exported="false" />
 

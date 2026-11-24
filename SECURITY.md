@@ -40,6 +40,20 @@ Please include:
 - **Supply chain.** A dependency, Gradle wrapper or model artefact that can be
   substituted without detection.
 
+## Update integrity
+
+Chronos updates itself from this repository's GitHub Releases. Two things are
+worth knowing before you report an issue here:
+
+- Builds are signed with a **public test key** committed at
+  `keystore/test-release.p12`, so that CI builds install over each other without
+  manual secret setup. That means the signature does **not** prove authorship.
+  `keystore/README.md` documents the tradeoff and how to rotate it.
+- The updater downloads only from this repository's releases over HTTPS and
+  verifies the published SHA-256 before handing the APK to the system installer. A
+  checksum that can be bypassed, a download accepted from another host, or an APK
+  installed without the published checksum being verified **is** a vulnerability.
+
 ## Out of scope
 
 - Android platform limitations described in [docs/PERMISSIONS.md](docs/PERMISSIONS.md):

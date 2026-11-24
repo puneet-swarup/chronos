@@ -7,6 +7,11 @@ plugins {
  id("com.google.devtools.ksp")
 }
 
+// CI passes the real values; a local build stays at the defaults below so a
+// developer never has to think about version codes.
+val buildVersionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull() ?: 1
+val buildVersionName = (project.findProperty("versionName") as String?) ?: "0.1.0"
+
 android {
  namespace = "com.chronos.app"
  compileSdk = 36
@@ -15,15 +20,29 @@ android {
  applicationId = "com.chronos.app"
  minSdk = 28
  targetSdk = 36
- versionCode = 1
- versionName = "0.1.0"
+ versionCode = buildVersionCode
+ versionName = buildVersionName
  testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
  vectorDrawables { useSupportLibrary = true }
+ }
+
+ // A dedicated test key, committed on purpose so CI can produce builds that
+ // install over each other without any manual secret setup. It is public: see
+ // keystore/README.md for what that means and when to replace it.
+ signingConfigs {
+ create("testRelease") {
+ storeFile = rootProject.file("keystore/test-release.p12")
+ storePassword = "chronos-test"
+ keyAlias = "chronos"
+ keyPassword = "chronos-test"
+ storeType = "PKCS12"
+ }
  }
 
  buildTypes {
  release {
  isMinifyEnabled = false
+ signingConfig = signingConfigs.getByName("testRelease")
  proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
  }
  debug {

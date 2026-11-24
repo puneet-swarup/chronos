@@ -13,6 +13,10 @@ import com.chronos.app.scheduling.AlarmScheduler
 import com.chronos.app.scheduling.ScheduleExecutor
 import com.chronos.app.scheduling.ScheduleReconciler
 import com.chronos.app.ui.HomeViewModel
+import com.chronos.app.update.AndroidUpdateInstaller
+import com.chronos.app.update.GitHubReleaseSource
+import com.chronos.app.update.SharedPreferencesUpdateStore
+import com.chronos.app.update.UpdateManager
 import com.chronos.core.action.ActionRegistry
 import com.chronos.core.action.DefaultActions
 import com.chronos.core.ai.LocalModelProvider
@@ -52,6 +56,9 @@ object ServiceLocator {
     lateinit var scheduleExecutor: ScheduleExecutor
         private set
 
+    lateinit var updateManager: UpdateManager
+        private set
+
     // Broadcast receivers and the alarm path outlive any screen, so their work
     // runs here rather than in a ViewModel scope.
     lateinit var appScope: CoroutineScope
@@ -76,6 +83,14 @@ object ServiceLocator {
                 reconciler = scheduleReconciler,
             )
             appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+            updateManager = UpdateManager(
+                source = GitHubReleaseSource(),
+                installer = AndroidUpdateInstaller(appContext),
+                store = SharedPreferencesUpdateStore(appContext),
+                currentVersionCode = BuildConfig.VERSION_CODE,
+                currentVersionName = BuildConfig.VERSION_NAME,
+                scope = appScope,
+            )
             initialized = true
         }
     }

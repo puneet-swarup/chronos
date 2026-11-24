@@ -8,6 +8,10 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Self-updates: `UpdatePolicy` (pure), `UpdateManager`, `GitHubReleaseSource`,
+  `AndroidUpdateInstaller`, `InstallResultReceiver` and a Settings section that
+  checks, downloads, verifies and installs. A `Release` workflow publishes a signed
+  APK and its SHA-256 on every push to `main`, versioned by workflow run number.
 - Scheduling pipeline: `ReconciliationPlanner` (pure), `AlarmScheduler`,
   `ScheduleReconciler`, `AlarmReceiver`, `ScheduleExecutor` and `TimeChangeReceiver`.
   Schedules now arm on a real `AlarmManager`, fire, record an execution row and
