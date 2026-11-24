@@ -44,6 +44,11 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      # The exec bit is committed, but a clone on a filesystem that drops modes
+      # (or a Windows checkout) loses it, so make it explicit.
+      - name: Ensure Gradle wrapper is executable
+        run: chmod +x ./gradlew
+
       - name: Unit tests
         run: ./gradlew --no-daemon --stacktrace test
 
