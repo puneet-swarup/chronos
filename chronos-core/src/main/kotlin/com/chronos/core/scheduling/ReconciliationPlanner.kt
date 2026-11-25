@@ -3,14 +3,19 @@ package com.chronos.core.scheduling
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-// A single alarm the platform layer should arm. `exact` is what the device
-// actually allows, which is not always what the schedule wants; when they
-// differ, `note` records why so the UI can be honest about it.
+// A single piece of work the platform layer should schedule. `mechanism` says
+// which platform API owns it; `exact` is what the device actually allows, which is
+// not always what the schedule wants. When they differ, `note` records why so the
+// UI can be honest about it.
 data class ArmRequest(
     val scheduleId: String,
     val triggerAtMillis: Long,
     val nextRun: LocalDateTime,
+    val mechanism: ExecutionMechanism,
     val exact: Boolean,
+    // Only set for interval work, where WorkManager needs the period rather than
+    // a single instant.
+    val intervalMinutes: Long? = null,
     val note: String? = null,
 )
 
@@ -33,13 +38,13 @@ data class ReconciliationPlan(
     val degraded: List<ArmRequest> get() = arm.filter { it.note != null }
 }
 
-// Turns persisted schedules into alarm operations. This is the whole of the
-// "reliability" decision: which schedules to arm, at which instant, and with
-// which precision. Everything below it is a thin platform adapter.
+// Turns persisted schedules into platform operations. This is the whole of the
+// "reliability" decision: which schedules to arm, at which instant, through which
+// mechanism. Everything below it is a thin adapter.
 //
-// Every schedule that is armed is also listed for cancellation first. Cancelling
-// a PendingIntent is idempotent, and doing it before arming means a stale alarm
-// left over from a previous pass cannot fire between planning and arming.
+// Every schedule that is armed is also listed for cancellation first. Cancelling is
+// idempotent, and doing it before arming means a stale trigger left over from a
+// previous pass cannot fire between planning and arming.
 class ReconciliationPlanner(private val engine: RecurrenceEngine = RecurrenceEngine()) {
 
     fun plan(
@@ -76,35 +81,42 @@ class ReconciliationPlanner(private val engine: RecurrenceEngine = RecurrenceEng
                 continue
             }
 
+            val triggerAt = next.atZone(zone).toInstant().toEpochMilli()
+            cancel.add(schedule.id)
+
             when (decision.mechanism) {
                 ExecutionMechanism.EVENT_DRIVEN -> Unit // handled above
 
-                ExecutionMechanism.EXACT_ALARM -> {
-                    cancel.add(schedule.id)
-                    arm.add(
-                        ArmRequest(
-                            scheduleId = schedule.id,
-                            triggerAtMillis = next.atZone(zone).toInstant().toEpochMilli(),
-                            nextRun = next,
-                            exact = canScheduleExact,
-                            note = if (canScheduleExact) {
-                                null
-                            } else {
-                                "exact alarm access not granted; armed as an inexact alarm"
-                            },
-                        ),
-                    )
-                }
+                ExecutionMechanism.EXACT_ALARM -> arm.add(
+                    ArmRequest(
+                        scheduleId = schedule.id,
+                        triggerAtMillis = triggerAt,
+                        nextRun = next,
+                        mechanism = ExecutionMechanism.EXACT_ALARM,
+                        exact = canScheduleExact,
+                        note = if (canScheduleExact) {
+                            null
+                        } else {
+                            "exact alarm access not granted; armed as an inexact alarm"
+                        },
+                    ),
+                )
 
                 ExecutionMechanism.FLEXIBLE_WORK -> {
-                    cancel.add(schedule.id)
+                    val interval = schedule.recurrence?.intervalMinutes
                     arm.add(
                         ArmRequest(
                             scheduleId = schedule.id,
-                            triggerAtMillis = next.atZone(zone).toInstant().toEpochMilli(),
+                            triggerAtMillis = triggerAt,
                             nextRun = next,
+                            mechanism = ExecutionMechanism.FLEXIBLE_WORK,
                             exact = false,
-                            note = "flexible work is not implemented yet; armed as an inexact alarm",
+                            intervalMinutes = interval,
+                            note = if (interval != null && interval < WORK_MIN_INTERVAL_MINUTES) {
+                                "interval shorter than WorkManager's minimum; scheduled as one-off work"
+                            } else {
+                                null
+                            },
                         ),
                     )
                 }
@@ -112,5 +124,10 @@ class ReconciliationPlanner(private val engine: RecurrenceEngine = RecurrenceEng
         }
 
         return ReconciliationPlan(cancel = cancel, arm = arm, skip = skip)
+    }
+
+    companion object {
+        // WorkManager refuses periodic work more frequent than this.
+        const val WORK_MIN_INTERVAL_MINUTES: Long = 15
     }
 }

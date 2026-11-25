@@ -8,6 +8,14 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- WorkManager for flexible and interval work: `WorkScheduler`, `ScheduleWorker` and
+  unique work per schedule, replacing the inexact-alarm fallback for long intervals.
+  Intervals below WorkManager's 15 minute floor are reported as degraded rather than
+  silently rounded.
+- Activity screen: execution history with failure counts, error detail, and the last
+  scheduler pass, so nothing Chronos attempts stays invisible.
+- Settings: permissions card with a granted count and what is missing, plus a way to
+  replay the first-run guide.
 - Home dashboard: next alarm, active and total schedule counts, and a "needs
   attention" card listing missing permissions as consequences.
 - Real navigation icons (Material icon set) instead of the first letter of each
@@ -61,6 +69,9 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- `WorkflowValidator` now rejects workflows that can loop forever, naming the cycle,
+  and warns about dead nodes after a stop. A condition branching back to itself
+  previously validated cleanly.
 - The first-run guide now re-reads permission state when the screen resumes, so
   returning from a system dialog is noticed, and advances by itself once the
   current step has been granted. A settings screen that does not exist on a device

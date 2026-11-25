@@ -30,6 +30,7 @@ data class ReconciliationResult(
 class ScheduleReconciler(
     private val repository: ScheduleRepository,
     private val scheduler: AlarmScheduler,
+    private val workScheduler: WorkScheduler,
     private val planner: ReconciliationPlanner = ReconciliationPlanner(),
     private val clock: Clock = Clock.systemDefaultZone(),
 ) {
@@ -58,10 +59,18 @@ class ScheduleReconciler(
         )
 
         for (id in plan.cancel) {
+            // Both mechanisms are cancelled: the planner may have moved a schedule
+            // from one to the other, and a leftover of either kind would double-fire.
             scheduler.cancel(id)
+            workScheduler.cancel(id)
         }
         for (request in plan.arm) {
-            scheduler.arm(request)
+            when (request.mechanism) {
+                com.chronos.core.scheduling.ExecutionMechanism.FLEXIBLE_WORK ->
+                    workScheduler.schedule(request.scheduleId, request.intervalMinutes)
+
+                else -> scheduler.arm(request)
+            }
             repository.updateNextRun(request.scheduleId, request.nextRun.toString())
         }
         for (skipped in plan.skip) {
