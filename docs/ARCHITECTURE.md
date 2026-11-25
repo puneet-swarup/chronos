@@ -78,9 +78,11 @@ Room (schedules)  ->  ScheduleMapper  ->  ReconciliationPlanner  ->  Reconciliat
 - `ReconciliationPlanner` (in `chronos-core`, pure) decides, for every stored
   schedule, whether to cancel it, arm it, or skip it — and with which precision.
   It is the only place that reasons about "is this schedule still due?".
-- `AlarmScheduler` is the only class that touches `AlarmManager`. It makes no
-  decisions: it arms exactly when told to and exactness is available, otherwise it
-  uses `setAndAllowWhileIdle` and the planner has already recorded the degradation.
+- `AlarmScheduler` is the only class that touches `AlarmManager`; `WorkScheduler` is
+  the only one that touches `WorkManager`. Neither makes decisions: the planner has
+  already chosen the mechanism, and each adapter either performs the request or
+  reports that it could not. Interval work above WorkManager's 15 minute floor goes
+  to WorkManager as unique periodic work; everything else is an alarm.
 - `ScheduleReconciler` re-plans the whole set and runs on boot, after a package
   replace, on clock or timezone change, on app start, and after every firing. It is
   idempotent: each pass cancels and re-arms the same set.

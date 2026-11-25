@@ -12,6 +12,7 @@ import com.chronos.app.onboarding.SharedPreferencesOnboardingStore
 import com.chronos.app.scheduling.AlarmScheduler
 import com.chronos.app.scheduling.ScheduleExecutor
 import com.chronos.app.scheduling.ScheduleReconciler
+import com.chronos.app.scheduling.WorkScheduler
 import com.chronos.app.ui.ActivityViewModel
 import com.chronos.app.ui.HomeViewModel
 import com.chronos.app.update.AndroidUpdateInstaller
@@ -51,6 +52,9 @@ object ServiceLocator {
     lateinit var alarmScheduler: AlarmScheduler
         private set
 
+    lateinit var workScheduler: WorkScheduler
+        private set
+
     lateinit var scheduleReconciler: ScheduleReconciler
         private set
 
@@ -77,7 +81,8 @@ object ServiceLocator {
             capabilityProbe = AndroidCapabilityProbe(appContext)
             onboardingStore = SharedPreferencesOnboardingStore(appContext)
             alarmScheduler = AlarmScheduler(appContext)
-            scheduleReconciler = ScheduleReconciler(repository, alarmScheduler)
+            workScheduler = WorkScheduler(appContext)
+            scheduleReconciler = ScheduleReconciler(repository, alarmScheduler, workScheduler)
             scheduleExecutor = ScheduleExecutor(
                 repository = repository,
                 notifier = ExecutionNotifier(appContext),

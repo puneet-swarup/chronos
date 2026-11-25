@@ -13,7 +13,7 @@ intended it to be.
 | M2 | Workflow model, deterministic validator, intent compiler | Done, except execution state machine |
 | M3 | Action contract, registry, four built-in actions | Done |
 | M4 | Android app shell: Compose, navigation, Room, DI | Mostly done — Home screen is wired, five sections are static |
-| M5 | Android scheduling adapters: AlarmManager, WorkManager, reboot and clock-change recovery | In progress — alarms arm, fire and re-arm; WorkManager still missing |
+| M5 | Android scheduling adapters: AlarmManager, WorkManager, reboot and clock-change recovery | Done — both mechanisms arm, fire and re-arm; device verification outstanding |
 | M6 | Integrations: app discovery, device controls, event triggers, capability manager | Not started |
 | M7 | Local AI: LiteRT-LM provider, model manager, tiered model selection | Seam only — no model |
 | M8 | Advanced mode (Shizuku/Termux/Tasker), import/export, security audit, release | Partial — signed test builds and self-updates work; advanced mode and the audit are not started |
@@ -76,14 +76,18 @@ Done:
 6. `TimeChangeReceiver` — clock and timezone changes re-plan every schedule.
 7. Launcher and notification icons, so the app no longer ships the default robot.
 
+8. `WorkScheduler` + `ScheduleWorker` — WorkManager owns flexible and interval work,
+   with unique work per schedule so re-planning replaces rather than duplicates.
+   Intervals below WorkManager's 15 minute floor are reported as degraded instead of
+   being silently rounded.
+9. `Activity` screen — executions, failures and the last scheduler pass, read from
+   Room and the audit log.
+
 Still missing:
 
-- `WorkScheduler` — `WorkManager` for flexible and interval work, with constraints
-  and retry. Long intervals currently fall back to an inexact alarm, and the planner
-  records that degradation rather than hiding it.
-- Duplicate-execution prevention beyond "one PendingIntent per schedule id".
+- Constraints and retry policy on the WorkManager requests (currently none).
 - Exact-alarm-revoked and permission-change receivers surfaced in the UI.
-- The Activity screen that shows `executions` rows and reconciliation results.
+- Duplicate-execution prevention beyond unique work and one PendingIntent per id.
 
 Acceptance: a schedule survives reboot, a timezone change and a force-stop on a
 real device, and a failed arm is visible in the Activity screen.

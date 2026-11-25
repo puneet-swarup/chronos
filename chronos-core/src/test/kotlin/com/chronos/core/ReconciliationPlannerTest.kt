@@ -1,5 +1,6 @@
 package com.chronos.core
 
+import com.chronos.core.scheduling.ExecutionMechanism
 import com.chronos.core.scheduling.ReconciliationPlanner
 import com.chronos.core.scheduling.Recurrence
 import com.chronos.core.scheduling.RecurrenceType
@@ -139,16 +140,20 @@ class ReconciliationPlannerTest {
         val armed = plan.arm.single()
         assertTrue(armed.exact)
         assertNull(armed.note)
+        assertEquals(ExecutionMechanism.EXACT_ALARM, armed.mechanism)
         assertEquals(LocalDateTime.of(2026, 11, 24, 7, 10), armed.nextRun)
     }
 
     @Test
-    fun `long interval falls back to an inexact alarm and records why`() {
+    fun `long interval is handed to WorkManager with its period`() {
         val plan = planner.plan(listOf(interval("hourly", 60)), now, canScheduleExact = true, zone = zone)
 
         val armed = plan.arm.single()
+        assertEquals(ExecutionMechanism.FLEXIBLE_WORK, armed.mechanism)
+        assertEquals(60L, armed.intervalMinutes)
         assertFalse(armed.exact)
-        assertTrue(armed.note!!.contains("flexible work"))
+        // A 60 minute period is above WorkManager's floor, so nothing is degraded.
+        assertNull(armed.note)
         assertEquals(LocalDateTime.of(2026, 11, 24, 8, 0), armed.nextRun)
     }
 
