@@ -8,6 +8,12 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Home dashboard: next alarm, active and total schedule counts, and a "needs
+  attention" card listing missing permissions as consequences.
+- Real navigation icons (Material icon set) instead of the first letter of each
+  label, plus a top bar carrying the product name.
+- Brand theme taken from the app icon - amber on deep navy - with a complete light
+  scheme instead of a half-filled one.
 - Self-updates: `UpdatePolicy` (pure), `UpdateManager`, `GitHubReleaseSource`,
   `AndroidUpdateInstaller`, `InstallResultReceiver` and a Settings section that
   checks, downloads, verifies and installs. A `Release` workflow publishes a signed
@@ -55,6 +61,10 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- The first-run guide now re-reads permission state when the screen resumes, so
+  returning from a system dialog is noticed, and advances by itself once the
+  current step has been granted. A settings screen that does not exist on a device
+  now explains itself instead of leaving a button that looks dead.
 - README badges, documentation links and code fences restored after being flattened to
   bare URLs by the authoring toolchain.
 - Gradle wrapper downloads from the official Gradle distribution host instead of a

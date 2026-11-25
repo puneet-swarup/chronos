@@ -126,4 +126,62 @@ class OnboardingViewModelTest {
         assertFalse(vm.state.value.completed)
         assertEquals(OnboardingStep.WELCOME, vm.state.value.step)
     }
+
+    @Test
+    fun `granting the current permission advances without a tap`() {
+        val (vm, probe, _) = viewModel()
+        vm.next()
+        assertEquals(OnboardingStep.NOTIFICATIONS, vm.state.value.step)
+
+        probe.capabilities = DeviceCapabilities(notificationsEnabled = true)
+        vm.refresh()
+
+        assertEquals(OnboardingStep.EXACT_ALARMS, vm.state.value.step)
+    }
+
+    @Test
+    fun `a refresh with nothing granted stays on the step`() {
+        val (vm, _, _) = viewModel()
+        vm.next()
+        vm.refresh()
+        assertEquals(OnboardingStep.NOTIFICATIONS, vm.state.value.step)
+    }
+
+    @Test
+    fun `revoking a permission never advances`() {
+        val (vm, probe, _) = viewModel(DeviceCapabilities(notificationsEnabled = true))
+        vm.next()
+
+        probe.capabilities = DeviceCapabilities(notificationsEnabled = false)
+        vm.refresh()
+
+        assertEquals(OnboardingStep.NOTIFICATIONS, vm.state.value.step)
+    }
+
+    @Test
+    fun `auto-advance stops at the last step`() {
+        val (vm, probe, _) = viewModel()
+        vm.goTo(OnboardingStep.TOUR)
+        probe.capabilities = DeviceCapabilities(notificationsEnabled = true)
+        vm.refresh()
+        assertEquals(OnboardingStep.TOUR, vm.state.value.step)
+    }
+
+    @Test
+    fun `an unavailable system screen is reported instead of swallowed`() {
+        val (vm, _, _) = viewModel()
+        vm.reportActionUnavailable("no screen on this device")
+        assertEquals("no screen on this device", vm.state.value.message)
+
+        vm.clearMessage()
+        assertNull(vm.state.value.message)
+    }
+
+    @Test
+    fun `moving between steps clears a stale message`() {
+        val (vm, _, _) = viewModel()
+        vm.reportActionUnavailable("no screen on this device")
+        vm.next()
+        assertNull(vm.state.value.message)
+    }
 }
