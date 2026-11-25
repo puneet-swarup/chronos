@@ -29,13 +29,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.chronos.app.onboarding.DeviceCapabilities
 import com.chronos.app.onboarding.OnboardingScreen
 import com.chronos.app.ui.ActivityScreen
 import com.chronos.app.ui.AiAssistantScreen
@@ -59,7 +62,7 @@ fun ChronosRoot() {
     val onboardingState by onboarding.state.collectAsState()
 
     if (onboardingState.completed) {
-        ChronosApp()
+        ChronosApp(onReplayGuide = onboarding::reopen)
     } else {
         OnboardingScreen(
             state = onboardingState,
@@ -86,12 +89,15 @@ private val navItems = listOf(
 )
 
 @Composable
-fun ChronosApp() {
+fun ChronosApp(onReplayGuide: () -> Unit = {}) {
     val navController = rememberNavController()
     val homeViewModel = remember { ServiceLocator.newHomeViewModel() }
     val homeState by homeViewModel.state.collectAsState()
     val updateManager = remember { ServiceLocator.updateManager }
     val updateState by updateManager.state.collectAsState()
+    val activityViewModel = remember { ServiceLocator.newActivityViewModel() }
+    val activityState by activityViewModel.state.collectAsState()
+    var permissions by remember { mutableStateOf(ServiceLocator.capabilityProbe.read()) }
 
     // Throttled inside the manager, so this is cheap on every cold start.
     LaunchedEffect(Unit) { updateManager.checkOnStart() }
@@ -157,13 +163,19 @@ fun ChronosApp() {
             composable("schedule") { ScheduleScreen() }
             composable("automations") { AutomationsScreen() }
             composable("ai") { AiAssistantScreen() }
-            composable("activity") { ActivityScreen() }
+            composable("activity") { ActivityScreen(activityState) }
             composable("settings") {
+                // Permission state is re-read whenever this screen appears, so it
+                // reflects what the user just changed outside the app.
+                LaunchedEffect(Unit) { permissions = ServiceLocator.capabilityProbe.read() }
                 SettingsScreen(
                     updateState = updateState,
                     currentVersion = BuildConfig.VERSION_NAME,
+                    permissions = permissions,
                     onCheckForUpdates = updateManager::checkNow,
                     onInstall = updateManager::install,
+                    onReplayGuide = onReplayGuide,
+                    onRefreshPermissions = { permissions = ServiceLocator.capabilityProbe.read() },
                 )
             }
         }

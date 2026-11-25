@@ -33,6 +33,8 @@ class ScheduleRepository(
 
     fun observeExecutions(): Flow<List<ExecutionEntity>> = executionDao.observeRecent()
 
+    fun observeAudit(): Flow<List<AuditEntity>> = auditDao.observeRecent()
+
     suspend fun recordExecution(execution: ExecutionEntity): Long = executionDao.insert(execution)
 
     suspend fun recordAudit(category: String, message: String) {

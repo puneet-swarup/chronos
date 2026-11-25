@@ -12,6 +12,7 @@ import com.chronos.app.onboarding.SharedPreferencesOnboardingStore
 import com.chronos.app.scheduling.AlarmScheduler
 import com.chronos.app.scheduling.ScheduleExecutor
 import com.chronos.app.scheduling.ScheduleReconciler
+import com.chronos.app.ui.ActivityViewModel
 import com.chronos.app.ui.HomeViewModel
 import com.chronos.app.update.AndroidUpdateInstaller
 import com.chronos.app.update.GitHubReleaseSource
@@ -99,4 +100,6 @@ object ServiceLocator {
 
     fun newOnboardingViewModel(): OnboardingViewModel =
         OnboardingViewModel(capabilityProbe, onboardingStore)
+
+    fun newActivityViewModel(): ActivityViewModel = ActivityViewModel(repository)
 }
