@@ -31,8 +31,9 @@ class ScheduleDraftTest {
             .toSchedule("id-1", now)
 
         assertEquals(ScheduleKind.RECURRENCE, schedule.kind)
-        assertEquals(RecurrenceType.DAILY, schedule.recurrence!!.type)
-        assertEquals(LocalTime.of(6, 15), schedule.recurrence.time)
+        val recurrence = schedule.recurrence!!
+        assertEquals(RecurrenceType.DAILY, recurrence.type)
+        assertEquals(LocalTime.of(6, 15), recurrence.time)
         assertEquals("Morning run", schedule.name)
         assertEquals("id-1", schedule.id)
     }
@@ -40,6 +41,7 @@ class ScheduleDraftTest {
     @Test
     fun `weekdays covers monday to friday`() {
         val schedule = ScheduleDraft(name = "Standup", repeat = RepeatOption.WEEKDAYS).toSchedule("id-2", now)
+        val weekdays = schedule.recurrence!!.weekdays
         assertEquals(
             setOf(
                 DayOfWeek.MONDAY,
@@ -48,14 +50,15 @@ class ScheduleDraftTest {
                 DayOfWeek.THURSDAY,
                 DayOfWeek.FRIDAY,
             ),
-            schedule.recurrence!!.weekdays,
+            weekdays,
         )
     }
 
     @Test
     fun `weekly uses the weekday the draft was created on`() {
         val schedule = ScheduleDraft(name = "Review", repeat = RepeatOption.WEEKLY).toSchedule("id-3", now)
-        assertEquals(setOf(DayOfWeek.WEDNESDAY), schedule.recurrence!!.weekdays)
+        val weekdays = schedule.recurrence!!.weekdays
+        assertEquals(setOf(DayOfWeek.WEDNESDAY), weekdays)
     }
 
     @Test
