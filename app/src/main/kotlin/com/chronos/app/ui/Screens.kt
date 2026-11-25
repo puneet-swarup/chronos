@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
@@ -177,14 +176,6 @@ private fun AttentionCard(problems: List<String>, onOpenSettings: () -> Unit) {
 
 // Sections that are still placeholders. Each says what it will do, so an empty
 // screen is a statement of intent rather than a dead end.
-@Composable
-fun ScheduleScreen() = PlaceholderScreen(
-    title = "Schedule",
-    subtitle = "Alarms, recurring events and the task timeline.",
-    detail = "The engine behind this is built and tested; the list and editor land next.",
-    icon = { Icon(Icons.Filled.DateRange, contentDescription = null, modifier = Modifier.size(28.dp)) },
-)
-
 @Composable
 fun AutomationsScreen() = PlaceholderScreen(
     title = "Automations",

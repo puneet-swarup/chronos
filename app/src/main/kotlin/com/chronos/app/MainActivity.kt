@@ -44,7 +44,8 @@ import com.chronos.app.ui.ActivityScreen
 import com.chronos.app.ui.AiAssistantScreen
 import com.chronos.app.ui.AutomationsScreen
 import com.chronos.app.ui.HomeScreen
-import com.chronos.app.ui.ScheduleScreen
+import com.chronos.app.ui.schedule.ScheduleEditorScreen
+import com.chronos.app.ui.schedule.ScheduleListScreen
 import com.chronos.app.ui.SettingsScreen
 import com.chronos.app.ui.theme.ChronosTheme
 
@@ -97,6 +98,8 @@ fun ChronosApp(onReplayGuide: () -> Unit = {}) {
     val updateState by updateManager.state.collectAsState()
     val activityViewModel = remember { ServiceLocator.newActivityViewModel() }
     val activityState by activityViewModel.state.collectAsState()
+    val scheduleViewModel = remember { ServiceLocator.newScheduleViewModel() }
+    val scheduleState by scheduleViewModel.state.collectAsState()
     var permissions by remember { mutableStateOf(ServiceLocator.capabilityProbe.read()) }
 
     // Throttled inside the manager, so this is cheap on every cold start.
@@ -160,7 +163,23 @@ fun ChronosApp(onReplayGuide: () -> Unit = {}) {
                     onOpenSettings = { navController.navigate("settings") },
                 )
             }
-            composable("schedule") { ScheduleScreen() }
+            composable("schedule") {
+                if (scheduleState.isEditing) {
+                    ScheduleEditorScreen(
+                        state = scheduleState,
+                        onChange = scheduleViewModel::updateDraft,
+                        onSave = scheduleViewModel::save,
+                        onCancel = scheduleViewModel::cancelEdit,
+                    )
+                } else {
+                    ScheduleListScreen(
+                        state = scheduleState,
+                        onCreate = scheduleViewModel::startNew,
+                        onToggle = scheduleViewModel::setEnabled,
+                        onDelete = scheduleViewModel::delete,
+                    )
+                }
+            }
             composable("automations") { AutomationsScreen() }
             composable("ai") { AiAssistantScreen() }
             composable("activity") { ActivityScreen(activityState) }

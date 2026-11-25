@@ -8,6 +8,11 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Schedule editor: name, time and repeat (once, daily, weekdays, weekly) with a
+  schedule list that shows the exact next run, enable/disable switches and delete.
+  Saving arms the alarm immediately instead of waiting for the next boot. This was
+  the missing piece - until now nothing in the app could create a schedule, so the
+  alarm pipeline could not be exercised at all.
 - WorkManager for flexible and interval work: `WorkScheduler`, `ScheduleWorker` and
   unique work per schedule, replacing the inexact-alarm fallback for long intervals.
   Intervals below WorkManager's 15 minute floor are reported as degraded rather than

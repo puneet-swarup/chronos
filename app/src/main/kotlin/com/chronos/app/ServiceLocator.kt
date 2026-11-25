@@ -14,6 +14,7 @@ import com.chronos.app.scheduling.ScheduleExecutor
 import com.chronos.app.scheduling.ScheduleReconciler
 import com.chronos.app.scheduling.WorkScheduler
 import com.chronos.app.ui.ActivityViewModel
+import com.chronos.app.ui.schedule.ScheduleViewModel
 import com.chronos.app.ui.HomeViewModel
 import com.chronos.app.update.AndroidUpdateInstaller
 import com.chronos.app.update.GitHubReleaseSource
@@ -107,4 +108,7 @@ object ServiceLocator {
         OnboardingViewModel(capabilityProbe, onboardingStore)
 
     fun newActivityViewModel(): ActivityViewModel = ActivityViewModel(repository)
+
+    fun newScheduleViewModel(): ScheduleViewModel =
+        ScheduleViewModel(repository, scheduleReconciler)
 }
