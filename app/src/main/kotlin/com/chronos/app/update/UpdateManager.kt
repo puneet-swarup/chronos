@@ -18,6 +18,8 @@ interface ReleaseSource {
 // AndroidUpdateInstaller.
 interface UpdateInstaller {
     suspend fun install(release: ReleaseInfo): Result<Unit>
+    fun canInstallPackages(): Boolean
+    fun openInstallPermissionSettings()
 }
 
 // Remembers when we last asked, so a cold start does not always hit the network.
@@ -72,6 +74,11 @@ class UpdateManager(
         }
     }
 
+    // Sends the user to the "install unknown apps" screen for Chronos.
+    fun openInstallPermissionSettings() {
+        runCatching { installer.openInstallPermissionSettings() }
+    }
+
     fun install(release: ReleaseInfo) {
         scope.launch {
             _state.value = UpdateState.Downloading(release)
@@ -80,7 +87,13 @@ class UpdateManager(
                 .getOrElse { Result.failure(it) }
             _state.value = result.fold(
                 onSuccess = { UpdateState.Installed(release) },
-                onFailure = { UpdateState.Failed(it.message ?: "Update failed") },
+                onFailure = { error ->
+                    if (error is InstallPermissionRequired) {
+                        UpdateState.NeedsInstallPermission
+                    } else {
+                        UpdateState.Failed(error.message ?: "Update failed")
+                    }
+                },
             )
         }
     }

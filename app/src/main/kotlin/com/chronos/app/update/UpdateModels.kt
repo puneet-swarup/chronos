@@ -1,5 +1,10 @@
 package com.chronos.app.update
 
+// Thrown when Android has not been told that Chronos may install packages. It is a
+// permission the user grants outside the app, so it gets its own state and its own
+// button rather than a generic failure.
+class InstallPermissionRequired : Exception("Allow Chronos to install unknown apps")
+
 // One published build, as the app sees it on GitHub Releases.
 data class ReleaseInfo(
     val versionCode: Int,
@@ -24,6 +29,7 @@ sealed class UpdateState {
     data class Available(val release: ReleaseInfo) : UpdateState()
     data class Downloading(val release: ReleaseInfo) : UpdateState()
     data class Installing(val release: ReleaseInfo) : UpdateState()
+    data object NeedsInstallPermission : UpdateState()
     data class Installed(val release: ReleaseInfo) : UpdateState()
     data class Failed(val message: String) : UpdateState()
 }

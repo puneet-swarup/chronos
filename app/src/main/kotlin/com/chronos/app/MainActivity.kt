@@ -176,6 +176,7 @@ fun ChronosApp(onReplayGuide: () -> Unit = {}) {
                     onInstall = updateManager::install,
                     onReplayGuide = onReplayGuide,
                     onRefreshPermissions = { permissions = ServiceLocator.capabilityProbe.read() },
+                    onOpenInstallPermission = updateManager::openInstallPermissionSettings,
                 )
             }
         }
