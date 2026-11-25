@@ -10,8 +10,8 @@ import org.junit.Test
 
 class HomeViewModelTest {
 
- private fun schedule(id: String, enabled: Boolean) =
- ScheduleEntity(id, "s" + id, "FIXED", null, null, enabled, null)
+ private fun schedule(id: String, enabled: Boolean, nextRun: String? = null) =
+ ScheduleEntity(id, "s" + id, "FIXED", null, null, enabled, nextRun)
 
  @Test
  fun emptySchedulesGiveZeroCounts() {
