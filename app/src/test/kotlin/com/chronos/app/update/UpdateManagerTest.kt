@@ -21,11 +21,17 @@ private class FakeSource(
 
 private class FakeInstaller(
     var result: Result<Unit> = Result.success(Unit),
+    var canInstall: Boolean = true,
 ) : UpdateInstaller {
     var installed: ReleaseInfo? = null
+    var openedSettings = false
     override suspend fun install(release: ReleaseInfo): Result<Unit> {
         installed = release
         return result
+    }
+    override fun canInstallPackages(): Boolean = canInstall
+    override fun openInstallPermissionSettings() {
+        openedSettings = true
     }
 }
 
@@ -163,5 +169,21 @@ class UpdateManagerTest {
         val (vm, _, _) = manager()
         vm.onInstallResult(success = true)
         assertEquals(UpdateState.Idle, vm.state.value)
+    }
+
+    @Test
+    fun `a missing install permission is its own state, not a generic failure`() {
+        val installer = FakeInstaller(result = Result.failure(InstallPermissionRequired()))
+        val (vm, _, _) = manager(installer = installer)
+        vm.install(release)
+
+        assertEquals(UpdateState.NeedsInstallPermission, vm.state.value)
+    }
+
+    @Test
+    fun `the install permission screen can be opened from the manager`() {
+        val (vm, _, installer) = manager()
+        vm.openInstallPermissionSettings()
+        assertTrue(installer.openedSettings)
     }
 }

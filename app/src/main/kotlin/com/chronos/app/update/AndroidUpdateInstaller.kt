@@ -4,7 +4,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import java.io.File
 import java.io.IOException
@@ -24,8 +26,23 @@ class AndroidUpdateInstaller(
     private val context: Context,
 ) : UpdateInstaller {
 
+    // Without this the commit throws a SecurityException and the user sees nothing.
+    override fun canInstallPackages(): Boolean =
+        runCatching { context.packageManager.canRequestPackageInstalls() }.getOrDefault(false)
+
+    override fun openInstallPermissionSettings() {
+        runCatching {
+            context.startActivity(
+                Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES)
+                    .setData(Uri.parse("package:" + context.packageName))
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            )
+        }
+    }
+
     override suspend fun install(release: ReleaseInfo): Result<Unit> = withContext(Dispatchers.IO) {
         runCatching {
+            if (!canInstallPackages()) throw InstallPermissionRequired()
             val apk = download(release)
             val expected = release.sha256Url?.let { fetchText(it).trim().substringBefore(' ') }
             if (!expected.isNullOrBlank()) {

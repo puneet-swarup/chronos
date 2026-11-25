@@ -35,6 +35,7 @@ fun SettingsScreen(
     onInstall: (ReleaseInfo) -> Unit,
     onReplayGuide: () -> Unit,
     onRefreshPermissions: () -> Unit,
+    onOpenInstallPermission: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -74,6 +75,7 @@ fun SettingsScreen(
             state = updateState,
             onCheckForUpdates = onCheckForUpdates,
             onInstall = onInstall,
+            onOpenInstallPermission = onOpenInstallPermission,
         )
 
         Spacer(Modifier.height(24.dp))
@@ -90,6 +92,7 @@ private fun UpdateCard(
     state: UpdateState,
     onCheckForUpdates: () -> Unit,
     onInstall: (ReleaseInfo) -> Unit,
+    onOpenInstallPermission: () -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -152,6 +155,15 @@ private fun UpdateCard(
 
                 is UpdateState.Installing -> {
                     Text("Handing the update to Android…", style = MaterialTheme.typography.bodyMedium)
+                }
+
+                is UpdateState.NeedsInstallPermission -> {
+                    Text(
+                        text = "Android needs your permission before Chronos can install an update.",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Button(onClick = onOpenInstallPermission) { Text("Allow installs") }
                 }
 
                 is UpdateState.Installed -> {
