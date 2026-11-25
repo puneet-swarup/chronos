@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.os.Build
 import android.util.Log
 import com.chronos.app.ServiceLocator
 import kotlinx.coroutines.launch
@@ -45,12 +46,14 @@ class InstallResultReceiver : BroadcastReceiver() {
         }
     }
 
+    // The confirmation dialog arrives as Intent.EXTRA_INTENT ("android.intent.extra.INTENT"),
+    // not a PackageInstaller constant.
     private fun confirmationIntent(intent: Intent): Intent? =
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(PackageInstaller.EXTRA_INTENT, Intent::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(Intent.EXTRA_INTENT, Intent::class.java)
         } else {
             @Suppress("DEPRECATION")
-            intent.getParcelableExtra(PackageInstaller.EXTRA_INTENT)
+            intent.getParcelableExtra(Intent.EXTRA_INTENT)
         }
 
     private fun report(context: Context, success: Boolean, message: String?) {
