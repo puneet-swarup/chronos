@@ -1,10 +1,10 @@
 package com.chronos.app.onboarding
 
 // Pure-Kotlin onboarding model. Nothing here touches Android, so the step order,
-// the gating rules and the summary maths are unit-testable on any JVM.
+// the auto-advance rule and the permission mapping are unit-testable on any JVM.
 
-// What the user can do about a step. Each value maps to a concrete Android
-// action in OnboardingScreen; NONE means the step is informational.
+// What the user can do about a step. Each value maps to a concrete Android action
+// in OnboardingScreen; NONE means the step is informational.
 enum class OnboardingAction {
     NONE,
     REQUEST_NOTIFICATIONS,
@@ -113,6 +113,13 @@ data class DeviceCapabilities(
         ).count { it }
 
     val totalCount: Int get() = 4
+
+    // Plain-language list of what is still missing, for the Home screen.
+    fun missing(): List<String> = buildList {
+        if (!notificationsEnabled) add("Notifications are off - alarms will be silent")
+        if (!exactAlarmsAllowed) add("Exact alarms not allowed - schedules may run late")
+        if (!batteryOptimisationIgnored) add("Not exempt from battery optimisation - idle phones may skip alarms")
+    }
 }
 
 // Reads the live permission state. Implemented against Android in
@@ -132,13 +139,15 @@ data class OnboardingUiState(
     val step: OnboardingStep = OnboardingStep.first,
     val capabilities: DeviceCapabilities = DeviceCapabilities(),
     val completed: Boolean = false,
+    // Set when the device has no settings screen for a step, so the tap has a
+    // visible explanation instead of appearing to do nothing.
+    val message: String? = null,
 ) {
     val stepNumber: Int get() = step.ordinal + 1
     val stepCount: Int get() = OnboardingStep.entries.size
     val isFirstStep: Boolean get() = step == OnboardingStep.first
     val isLastStep: Boolean get() = step == OnboardingStep.last
 
-    // True when this step asks the user for something and they have not granted
-    // it yet. The screen uses it to decide whether to show the status badge.
+    // True when this step asks the user for something and they have granted it.
     val currentStepGranted: Boolean? get() = capabilities.isGranted(step.action)
 }

@@ -22,28 +22,56 @@ class OnboardingViewModel(
     )
     val state: StateFlow<OnboardingUiState> = _state.asStateFlow()
 
-    // Called on entering the screen, when the user returns from a system
-    // settings screen, and after a permission dialog resolves.
+    // Called when the screen resumes - i.e. when the user comes back from a
+    // system dialog or settings screen.
+    //
+    // If the permission this step asked for has just been granted, the guide moves
+    // on by itself. Making the user find "Next" after they have already answered
+    // the question is the kind of friction that makes an app feel unresponsive.
     fun refresh() {
-        _state.update { it.copy(capabilities = probe.read()) }
+        val before = _state.value
+        val after = probe.read()
+        val grantedNow = before.currentStepGranted == false && after.isGranted(before.step.action) == true
+        val advance = grantedNow && !before.isLastStep
+        _state.update { current ->
+            current.copy(
+                capabilities = after,
+                step = if (advance) {
+                    OnboardingStep.entries[current.step.ordinal + 1]
+                } else {
+                    current.step
+                },
+                message = if (grantedNow) null else current.message,
+            )
+        }
+    }
+
+    // A step whose system screen does not exist on this device. Reported rather
+    // than swallowed, so the button never looks broken.
+    fun reportActionUnavailable(reason: String) {
+        _state.update { it.copy(message = reason) }
+    }
+
+    fun clearMessage() {
+        _state.update { it.copy(message = null) }
     }
 
     fun next() {
         _state.update { current ->
             val following = OnboardingStep.entries.getOrNull(current.step.ordinal + 1)
-            if (following == null) current else current.copy(step = following)
+            if (following == null) current else current.copy(step = following, message = null)
         }
     }
 
     fun back() {
         _state.update { current ->
             val previous = OnboardingStep.entries.getOrNull(current.step.ordinal - 1)
-            if (previous == null) current else current.copy(step = previous)
+            if (previous == null) current else current.copy(step = previous, message = null)
         }
     }
 
     fun goTo(step: OnboardingStep) {
-        _state.update { it.copy(step = step) }
+        _state.update { it.copy(step = step, message = null) }
     }
 
     // The guide is never a gate: skipping is allowed from the first page, and
@@ -55,6 +83,13 @@ class OnboardingViewModel(
 
     fun reopen() {
         store.reset()
-        _state.update { it.copy(completed = false, step = OnboardingStep.first, capabilities = probe.read()) }
+        _state.update {
+            it.copy(
+                completed = false,
+                step = OnboardingStep.first,
+                capabilities = probe.read(),
+                message = null,
+            )
+        }
     }
 }
