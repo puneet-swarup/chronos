@@ -84,6 +84,9 @@ dependencies {
  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
  implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
  implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+ // LocalLifecycleOwner for the first-run guide, which re-reads permission state
+ // when the screen resumes.
+ implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
  implementation("androidx.activity:activity-compose:1.9.3")
 
  val composeBom = platform("androidx.compose:compose-bom:2024.10.01")
@@ -94,6 +97,9 @@ dependencies {
  // transitively, but the first-run guide uses foundation directly.
  implementation("androidx.compose.foundation:foundation")
  implementation("androidx.compose.material3:material3")
+ // The curated icon set: enough for the navigation bar without pulling in the
+ // multi-megabyte extended library.
+ implementation("androidx.compose.material:material-icons-core")
  implementation("androidx.navigation:navigation-compose:2.8.4")
 
  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")

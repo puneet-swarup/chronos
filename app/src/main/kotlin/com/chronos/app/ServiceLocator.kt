@@ -95,7 +95,7 @@ object ServiceLocator {
         }
     }
 
-    fun newHomeViewModel(): HomeViewModel = HomeViewModel(repository)
+    fun newHomeViewModel(): HomeViewModel = HomeViewModel(repository, capabilityProbe)
 
     fun newOnboardingViewModel(): OnboardingViewModel =
         OnboardingViewModel(capabilityProbe, onboardingStore)

@@ -3,11 +3,28 @@ package com.chronos.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -50,19 +67,22 @@ fun ChronosRoot() {
             onBack = onboarding::back,
             onRefresh = onboarding::refresh,
             onFinish = onboarding::finish,
+            onActionUnavailable = onboarding::reportActionUnavailable,
         )
     }
 }
 
-private data class NavItem(val route: String, val label: String)
+private data class NavItem(val route: String, val label: String, val icon: ImageVector)
 
+// Real icons rather than the first letter of each label: a letter in a circle
+// reads as a placeholder, and the navigation is the most-seen surface in the app.
 private val navItems = listOf(
-    NavItem("home", "Home"),
-    NavItem("schedule", "Schedule"),
-    NavItem("automations", "Automations"),
-    NavItem("ai", "AI"),
-    NavItem("activity", "Activity"),
-    NavItem("settings", "Settings"),
+    NavItem("home", "Home", Icons.Filled.Home),
+    NavItem("schedule", "Schedule", Icons.Filled.DateRange),
+    NavItem("automations", "Automations", Icons.Filled.Build),
+    NavItem("ai", "AI", Icons.Filled.Star),
+    NavItem("activity", "Activity", Icons.Filled.List),
+    NavItem("settings", "Settings", Icons.Filled.Settings),
 )
 
 @Composable
@@ -77,6 +97,30 @@ fun ChronosApp() {
     LaunchedEffect(Unit) { updateManager.checkOnStart() }
 
     Scaffold(
+        topBar = {
+            Surface(color = MaterialTheme.colorScheme.surface, shadowElevation = 1.dp) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 14.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Column {
+                        Text(
+                            text = "Chronos",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Text(
+                            text = "Your phone. Your rules. Your automation.",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+        },
         bottomBar = {
             val backStack by navController.currentBackStackEntryAsState()
             val current = backStack?.destination
@@ -92,7 +136,7 @@ fun ChronosApp() {
                             }
                         },
                         label = { Text(item.label) },
-                        icon = { Text(item.label.take(1)) },
+                        icon = { Icon(item.icon, contentDescription = null) },
                     )
                 }
             }
@@ -103,7 +147,13 @@ fun ChronosApp() {
             startDestination = "home",
             modifier = Modifier.padding(innerPadding),
         ) {
-            composable("home") { HomeScreen(homeState) }
+            composable("home") {
+                HomeScreen(
+                    state = homeState,
+                    onCreateSchedule = { navController.navigate("schedule") },
+                    onOpenSettings = { navController.navigate("settings") },
+                )
+            }
             composable("schedule") { ScheduleScreen() }
             composable("automations") { AutomationsScreen() }
             composable("ai") { AiAssistantScreen() }
