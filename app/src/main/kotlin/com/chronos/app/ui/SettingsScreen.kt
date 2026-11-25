@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.chronos.app.onboarding.DeviceCapabilities
 import com.chronos.app.update.ReleaseInfo
 import com.chronos.app.update.UpdateState
 
@@ -29,8 +30,11 @@ import com.chronos.app.update.UpdateState
 fun SettingsScreen(
     updateState: UpdateState,
     currentVersion: String,
+    permissions: DeviceCapabilities,
     onCheckForUpdates: () -> Unit,
     onInstall: (ReleaseInfo) -> Unit,
+    onReplayGuide: () -> Unit,
+    onRefreshPermissions: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -52,6 +56,15 @@ fun SettingsScreen(
 
         Spacer(Modifier.height(24.dp))
         Text(
+            text = "Permissions",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Spacer(Modifier.height(8.dp))
+        PermissionsCard(permissions, onRefreshPermissions, onReplayGuide)
+
+        Spacer(Modifier.height(24.dp))
+        Text(
             text = "Updates",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
@@ -65,7 +78,7 @@ fun SettingsScreen(
 
         Spacer(Modifier.height(24.dp))
         Text(
-            text = "Coming here: permissions, integrations, AI models and advanced mode.",
+            text = "Coming here: integrations, AI models and advanced mode.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -157,6 +170,52 @@ private fun UpdateCard(
                     Spacer(Modifier.height(12.dp))
                     TextButton(onClick = onCheckForUpdates) { Text("Try again") }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PermissionsCard(
+    permissions: DeviceCapabilities,
+    onRefresh: () -> Unit,
+    onReplayGuide: () -> Unit,
+) {
+    val missing = permissions.missing()
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = permissions.grantedCount.toString() + " of " +
+                    permissions.totalCount + " granted",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(Modifier.height(8.dp))
+            if (missing.isEmpty()) {
+                Text(
+                    text = "Everything Chronos needs is granted.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            } else {
+                missing.forEach { problem ->
+                    Text(
+                        text = "\u2022 " + problem,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextButton(onClick = onRefresh) { Text("Re-check") }
+                TextButton(onClick = onReplayGuide) { Text("Replay the guide") }
             }
         }
     }
